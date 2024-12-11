@@ -1,11 +1,10 @@
 use rocket::{get, launch, routes};
 use sea_orm::{Database, DatabaseConnection};
 use std::sync::Arc;
-use dotenv::dotenv;
 
 mod models;
 
-const DATABASE_URL: &str = "";
+const DATABASE_URL: &str = "sqlite:./nowotion.db?mode=rwc";
 
 type DbConn = Arc<DatabaseConnection>;
 
