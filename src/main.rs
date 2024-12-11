@@ -17,14 +17,12 @@ async fn index() -> &'static str {
 // User registering
 #[derive(FromForm)]
 struct RegisterForm {
-    csrf_token: String,
     username: String,
     password: String,
 }
 
 #[post("/register", data = "<form>")]
 async fn register(db_conn: &State<Arc<DatabaseConnection>>, form: Form<RegisterForm>) -> &str {
-    let _csrf_token: &str= &form.csrf_token; // TODO: Use csrf token
     let username: &str = &form.username;
     let password: &str = &form.password;
 
@@ -36,7 +34,7 @@ async fn register(db_conn: &State<Arc<DatabaseConnection>>, form: Form<RegisterF
 
 #[get("/register")]
 async fn register_page() -> Template {
-    Template::render("register", context! {csrf_token: "TODO"}) // TODO: Use csrf token
+    Template::render("register", context! {}) // TODO: Use csrf token
 }
 
 #[launch]
