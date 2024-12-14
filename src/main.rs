@@ -1,54 +1,48 @@
-use rocket::{get, post, launch, routes, State};
-use rocket::form::{Form, FromForm};
-use sea_orm::{Database, DatabaseConnection};
+use dotenv::dotenv;
+use rocket::{get, launch, routes, State};
+use rocket_dyn_templates::Template;
+use rocket::http::{Cookie, CookieJar};
 use std::sync::Arc;
-use rocket_dyn_templates::{Template, context};
-use dotenv;
+use sea_orm::DatabaseConnection;
 
+mod auth;
+mod config;
 mod models;
-use models::crud;
 
+use auth::{login, login_page, register, register_page};
+use config::init_database;
 
 #[get("/")]
 async fn index() -> &'static str {
     "Hello, world!"
 }
 
-// User registering
-#[derive(FromForm)]
-struct RegisterForm {
-    username: String,
-    password: String,
-}
+#[get("/logged")]
+async fn logged(db_conn: &State<Arc<DatabaseConnection>>, cookies: &CookieJar<'_>) -> &'static str {
+    if let Some(cookie) = cookies.get("session_token") {
+        let token = cookie.value();
 
-#[post("/register", data = "<form>")]
-async fn register(db_conn: &State<Arc<DatabaseConnection>>, form: Form<RegisterForm>) -> &str {
-    let username: &str = &form.username;
-    let password: &str = &form.password;
-
-    match crud::insert_user(db_conn, username, password).await {
-        Ok(_) => "User created.",
-        Err(_) => "Error while creating user.",
+        if models::crud::is_valid_session_token(db_conn, token).await {
+            "Yes"
+        } else {
+            "No."
+        }
+    } else {
+        "No."
     }
-}
-
-#[get("/register")]
-async fn register_page() -> Template {
-    Template::render("register", context! {}) // TODO: Use csrf token
 }
 
 #[launch]
 async fn rocket() -> _ {
-    let database_url: String = dotenv::var("DATABASE_URL").unwrap();
+    dotenv().ok(); // Load .env variables
 
-    let db = Database::connect(database_url)
-        .await
-        .expect("Unable to connect to database.");
-
-    let db_conn = Arc::new(db);
+    let db_conn = init_database().await;
 
     rocket::build()
         .manage(db_conn)
-        .mount("/", routes![index, register, register_page])
+        .mount(
+            "/",
+            routes![index, register, register_page, login, login_page, logged],
+        )
         .attach(Template::fairing())
 }
