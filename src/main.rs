@@ -4,6 +4,7 @@ use rocket_dyn_templates::Template;
 use rocket::http::{Cookie, CookieJar};
 use std::sync::Arc;
 use sea_orm::DatabaseConnection;
+use rocket::response::Redirect;
 
 mod auth;
 mod config;
@@ -18,18 +19,9 @@ async fn index() -> &'static str {
 }
 
 #[get("/logged")]
-async fn logged(db_conn: &State<Arc<DatabaseConnection>>, cookies: &CookieJar<'_>) -> &'static str {
-    if let Some(cookie) = cookies.get("session_token") {
-        let token = cookie.value();
-
-        if models::crud::is_valid_session_token(db_conn, token).await {
-            "Yes"
-        } else {
-            "No."
-        }
-    } else {
-        "No."
-    }
+async fn logged(db_conn: &State<Arc<DatabaseConnection>>, cookies: &CookieJar<'_>) -> Result<&'static str, Redirect> {
+    requires_login!(db_conn, cookies);
+    Ok("You are logged in.")
 }
 
 #[launch]

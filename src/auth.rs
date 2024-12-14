@@ -63,3 +63,21 @@ pub async fn login(db_conn: &State<Arc<DatabaseConnection>>, form: Form<LoginFor
 pub async fn login_page() -> Template {
     Template::render("login", context! {})
 }
+
+#[macro_export]
+macro_rules! requires_login {
+    ($db_conn:expr, $cookies:expr) => {
+        use crate::models::crud;
+        use rocket::response::Redirect;
+
+        if let Some(cookie) = $cookies.get("session_token") {
+            let token = cookie.value();
+    
+            if !crud::is_valid_session_token($db_conn, token).await {
+                return Err(Redirect::to("/login"));
+            }
+        } else {
+            return Err(Redirect::to("/login"));
+        }
+    };
+}
