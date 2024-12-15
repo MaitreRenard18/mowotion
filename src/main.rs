@@ -10,7 +10,7 @@ mod auth;
 mod config;
 mod models;
 
-use auth::{login, login_page, register, register_page};
+use auth::{login, login_page, logout, register, register_page};
 use config::init_database;
 
 #[get("/")]
@@ -34,7 +34,7 @@ async fn rocket() -> _ {
         .manage(db_conn)
         .mount(
             "/",
-            routes![index, register, register_page, login, login_page, logged],
+            routes![index, register, register_page, login, login_page, logged, logout],
         )
         .attach(Template::fairing())
 }

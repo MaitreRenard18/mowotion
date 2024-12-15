@@ -67,17 +67,27 @@ pub async fn login_page() -> Template {
 #[macro_export]
 macro_rules! requires_login {
     ($db_conn:expr, $cookies:expr) => {
-        use crate::models::crud;
-        use rocket::response::Redirect;
-
         if let Some(cookie) = $cookies.get("session_token") {
             let token = cookie.value();
     
-            if !crud::is_valid_session_token($db_conn, token).await {
-                return Err(Redirect::to("/login"));
+            if !crate::models::crud::is_valid_session_token($db_conn, token).await {
+                return Err(rocket::response::Redirect::to("/login"));
             }
         } else {
-            return Err(Redirect::to("/login"));
+            return Err(rocket::response::Redirect::to("/login"));
         }
     };
+}
+
+
+// Logout
+#[get("/logout")]
+pub async fn logout(db_conn: &State<Arc<DatabaseConnection>>, cookies: &CookieJar<'_>) -> Result<Redirect, Redirect> {
+    requires_login!(db_conn, cookies);
+    cookies.remove("session_token");
+    match crud::delete_session(db_conn, &cookies.get("session_token").unwrap().value().to_string()).await {
+        Ok(_) => println!("Session deleted."),
+        Err(_) => println!("Error deleting session.")
+    }
+    Ok(Redirect::to("/"))
 }

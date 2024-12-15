@@ -1,5 +1,5 @@
 use sea_orm::entity::prelude::*;
-use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection};
+use sea_orm::{ActiveModelTrait, ActiveValue, DatabaseConnection, DeleteResult};
 use sea_orm::{EntityTrait, QueryFilter};
 
 use super::user::Entity as UserEntity;
@@ -78,4 +78,13 @@ pub async fn is_valid_session_token(db_conn: &DatabaseConnection, session_token:
     } else {
         false
     }
+}
+
+pub async fn delete_session(db_conn: &DatabaseConnection, session_token: &str) -> Result<DeleteResult, DbErr> {
+    println!("{}", session_token);
+
+    SessionEntity::delete_many()
+        .filter(SessionColumn::SessionToken.eq(session_token))
+        .exec(db_conn)
+        .await
 }
