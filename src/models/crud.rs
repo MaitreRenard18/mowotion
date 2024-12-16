@@ -88,3 +88,22 @@ pub async fn delete_session(db_conn: &DatabaseConnection, session_token: &str) -
         .exec(db_conn)
         .await
 }
+
+
+pub async fn get_user_by_session(db_conn: &DatabaseConnection, session_token: &str) -> Option<UserModel> {
+    let session = SessionEntity::find()
+        .filter(SessionColumn::SessionToken.eq(session_token))
+        .one(db_conn)
+        .await
+        .unwrap();
+
+    if let Some(s) = session {
+        UserEntity::find()
+            .filter(UserColumn::Id.eq(s.id))
+            .one(db_conn)
+            .await
+            .unwrap()
+    } else {
+        None
+    }
+}

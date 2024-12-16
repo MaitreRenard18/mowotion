@@ -3,13 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
+    <link rel="stylesheet" href="static/login.css">
+    <link rel="stylesheet" href="static/style.css">
+    <title>Login</title>
 </head>
 <body>
-    <form action="/login" method="post">
-        <input type="text" name="email">
-        <input type="password" name="password">
-        <input type="submit" value="Login" />
-    </form>
+    <main>
+        <div class="container">
+            <h2>Login to Nowotion</h2>
+            <form action="/login" method="post">
+                <label for="email">Email</label>
+                <input type="text" name="email">
+                <label for="email">Password</label>
+                <input type="password" name="password">
+                <input type="submit" value="Login" />
+            </form>
+        </div>
+    </main>
 </body>
 </html>

@@ -1,7 +1,22 @@
 <!DOCTYPE html>
-<head></head>
+<head>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet"/>
+    <link rel="stylesheet" href="static/home.css">
+    <link rel="stylesheet" href="static/style.css">
+</head>
 <html>
-    <body>
-        <h1>Argument is: {{context}}</h1>
+    <body style="display: flex;">
+        <nav class="sidebar">
+            <header>
+                <img class="pfp-small" src="static/pfp.jpg" alt="pfp">
+                <p>{{email}}</p>
+                <a style="margin-left: auto;" href="" class="material-symbols-rounded">settings</a>
+                <a href="/logout" class="material-symbols-rounded">logout</a>
+            </header>
+        </nav>
+
     </body>
 </html>
