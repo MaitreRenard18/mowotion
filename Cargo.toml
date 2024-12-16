@@ -1,7 +1,17 @@
 [package]
-name = "mowotion"
+name = "nowotion"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-rocket = "0.5.1"
+dotenv = "0.15.0"
+rand = "0.8.5"
+rocket = { version = "0.5.1", features = ["json"] }
+sea-orm = { version = "1.1.2", features = [ "sqlx-sqlite", "runtime-async-std-native-tls", "macros" ] }
+
+[dev-dependencies]
+sea-orm-cli = "1.1.2"
+
+[dependencies.rocket_dyn_templates]
+version = "0.2.0"
+features = ["minijinja"]

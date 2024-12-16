@@ -1,0 +1,39 @@
+.sidebar {
+    padding: 10px;
+    height: calc(100vh - 16px - 20px);
+    width: 250px;
+
+    background-color: var(--secondary-bg-color);
+    border-radius: 21px;
+}
+
+.sidebar header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar header a, .sidebar header p {
+    margin: 0;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.sidebar header a:last-of-type {
+    margin: 0;
+    margin-left: 5px;
+    margin-right: 0px;
+}
+
+.sidebar a {
+    text-decoration: none;
+}
+
+.pfp-small {
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    margin: 0px;
+    margin-right: 5px;
+}
+
