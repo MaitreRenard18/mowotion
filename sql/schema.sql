@@ -5,10 +5,9 @@ CREATE TABLE user (
 );
 
 CREATE TABLE session (
-    id INTEGER NOT NULL,
-    session_token UNIQUE TEXT NOT NULL,
-    csrf_token TEXT UNIQUE NOT NULL,
+    session_token TEXT UNIQUE NOT NULL,
+    user_id INTEGER PRIMARY KEY NOT NULL,
+    expire_date DATE NOT NULL,
 
-    PRIMARY KEY (id, session_token, csrf_token),
-    FOREIGN KEY (id) REFERENCES user (id)
+    FOREIGN KEY (user_id) REFERENCES user (id)
 );

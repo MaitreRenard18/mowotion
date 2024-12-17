@@ -8,7 +8,7 @@ use super::user::{ActiveModel as User, Column as UserColumn};
 use super::session::{ActiveModel as Session, Column as SessionColumn};
 use super::session::Entity as SessionEntity;
 use super::session::Model as SessionModel;
-use super::utils::{self, generate_csrf_token, generate_session_token};
+use super::utils::{self, generate_session_token, get_current_date, get_expire_date};
 
 pub async fn insert_user(db_conn: &DatabaseConnection, email: &str, password: &str) -> Result<UserModel, sea_orm::DbErr> {
     let new_user = User {
@@ -44,7 +44,7 @@ pub async fn get_user_by_email(db_conn: &DatabaseConnection, email: &str) -> Opt
 
 pub async fn get_or_create_session(db_conn: &DatabaseConnection, user: UserModel) -> Option<SessionModel> {
     let session = SessionEntity::find()
-        .filter(SessionColumn::Id.eq(user.id))
+        .filter(SessionColumn::UserId.eq(user.id))
         .one(db_conn)
         .await
         .unwrap();
@@ -53,9 +53,9 @@ pub async fn get_or_create_session(db_conn: &DatabaseConnection, user: UserModel
         Some(s)
     } else {
         let new_session = Session {
-            id: ActiveValue::Set(user.id),
+            user_id: ActiveValue::Set(user.id),
             session_token: ActiveValue::Set(generate_session_token().await),
-            csrf_token: ActiveValue::Set(generate_csrf_token().await),
+            expire_date: ActiveValue::Set(get_expire_date().await),
             ..Default::default()
         };
         
@@ -73,8 +73,8 @@ pub async fn is_valid_session_token(db_conn: &DatabaseConnection, session_token:
         .await
         .unwrap();
 
-    if let Some(_) = session {
-        true
+    if let Some(s) = session {
+        s.expire_date >= get_current_date().await
     } else {
         false
     }
@@ -99,7 +99,7 @@ pub async fn get_user_by_session(db_conn: &DatabaseConnection, session_token: &s
 
     if let Some(s) = session {
         UserEntity::find()
-            .filter(UserColumn::Id.eq(s.id))
+            .filter(UserColumn::Id.eq(s.user_id))
             .one(db_conn)
             .await
             .unwrap()
