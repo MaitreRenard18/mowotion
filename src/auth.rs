@@ -71,6 +71,7 @@ macro_rules! requires_login {
             let token = cookie.value();
     
             if !crate::models::crud::is_valid_session_token($db_conn, token).await {
+                $cookies.remove("session_token");
                 return Err(rocket::response::Redirect::to("/login"));
             }
         } else {

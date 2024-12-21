@@ -27,5 +27,6 @@ input {
     border: none;
     padding-left: 10px;
     height: 32px;
-    width: 100%;    
+    width: 100%;
+    color: black;
 }

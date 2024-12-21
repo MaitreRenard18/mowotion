@@ -16,15 +16,15 @@ use config::init_database;
 
 #[get("/")]
 async fn index(db_conn: &State<Arc<DatabaseConnection>>, cookies: &CookieJar<'_>) -> Result<Template, Redirect> {
-    requires_login!(db_conn, cookies);
+    requires_login!(db_conn, cookies); 
 
-    let user = crud::get_user_by_session(db_conn, cookies.get("session_token").unwrap().value())
-        .await
-        .unwrap();
+    if let Some(cookie) = cookies.get("session_token") {
+        if let Some(user) = crud::get_user_by_session(db_conn, cookie.value()).await {
+            return Ok(Template::render("index", context! {email: user.email}));
+        }
+    }
 
-    Ok(Template::render("index", context! {
-        email: user.email
-    }))
+    return Err(Redirect::to("/login"));
 }
 
 #[get("/logged")]
